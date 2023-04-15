@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Amazon Price Tracker</title>
+    <!-- Add Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+         .card-img-top {
+             width: 100%;
+             height: 15vw;
+             object-fit: contain;
+             padding: 15px;
+             background-color: #f8f9fa;
+        }
+        .product-column {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        .product-row {
+            margin-left: 25px;
+            margin-right: 25px;
+        }
+        .search-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row mt-3 justify-content-center">
+        <div class="col-md-4">
+            <form action="{% url 'scrape' %}" method="get" class="search-form d-flex">
+                <input type="hidden" name="page" value="1">
+                <input type="text" class="form-control flex-grow-1" name="search" placeholder="Search products...">
+                <button type="submit" class="btn btn-primary ml-2">Search</button>
+            </form>
+        </div>
+    </div>
+    <div class="row product-row mt-5">
+        {% if message %}
+        <div class="col-12 text-center">
+            <h4>{{ message }}</h4>
+        </div>
+        {% else %}
+        {% for img_url, product_title, product_price, product_link in combined_data %}
+        <div class="col-lg-2 col-md-6 col-sm-12 mb-4 product-column">
+            <div class="card h-100">
+                <img src="{{ img_url }}" alt="{{ product_title }}" class="card-img-top">
+                <div class="card-body">
+                    <a href="{% url 'redirect_view' %}?link={{ product_link }}" target="_blank">
+                        <h5 class="card-title">{{ product_title }}</h5>
+                    </a>
+                    <p class="card-text">${{ product_price }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if not message %}
+    <div class="row justify-content-center mt-4">
+        <div class="col-auto">
+            <nav>
+                <ul class="pagination">
+                    {% if current_page != 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">First</a>
+                    </li>
+                    {% endif %}
+                    <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ current_page|add:"-1" }}" {% if current_page == 1 %}tabindex="-1" aria-disabled="true"{% endif %}>Previous</a>
+                    </li>
+                    <li class="page-item">
+                        <span class="page-link">{{ current_page }}</span>
+                    </li>
+                    <li class="page-item {% if current_page == num_pages %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ current_page|add:"1" }}" {% if current_page == num_pages %}tabindex="-1" aria-disabled="true"{% endif %}>Next</a>
+                    </li>
+                    {% if current_page != num_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num_pages }}">Last</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
