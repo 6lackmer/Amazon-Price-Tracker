@@ -19,6 +19,6 @@ from scraper import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.scrape, name='scrape'),
+    path('search/', views.scrape, name='scrape'),
     path('external_redirect/', views.redirect_view, name='redirect_view'), # view to redirect to amazon
 ]

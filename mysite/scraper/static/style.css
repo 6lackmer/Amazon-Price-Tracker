@@ -1,0 +1,23 @@
+ .card-img-top {
+     width: 100%;
+     height: 15vw;
+     object-fit: contain;
+     padding: 15px;
+     background-color: #f8f9fa;
+}
+.product-column {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.product-row {
+    margin-left: 25px;
+    margin-right: 25px;
+}
+.search-form {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+}
+body {
+  background-color: red;
+}
