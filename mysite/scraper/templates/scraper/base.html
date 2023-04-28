@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Document</title>
+        <link rel="stylesheet" href="{% static 'scraper/style.css' %}">
+        <link rel="stylesheet"
+              href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+              integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+              crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+                integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+                crossorigin="anonymous"></script>
+        <style>
+         .card-img-top {
+             width: 100%;
+             height: 15vw;
+             object-fit: contain;
+             padding: 15px;
+             background-color: #f8f9fa;
+        }
+        .product-column {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        .product-row {
+            margin-left: 25px;
+            margin-right: 25px;
+        }
+        .search-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-dark bg-dark">
+            <a href="{%  url 'index' %}" class="navbar-brand">Amazon Price Tracker</a>
+            <div class="navbar">
+                {% if user.is_authenticated %}
+                    <form class="form-inline" action="{% url 'scrape' %}" method="GET">
+                        <input class="form-control mr-sm-2"
+                               type="search"
+                               placeholder="Search Amazon..."
+                               aria-label="Search"
+                               name="search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+                    <a href="{%  url 'my_products' %}" class="nav-item nav-link">My Products</a>
+                    <a href="{%  url 'logout' %}" class="nav-item nav-link">Logout</a>
+                {% else %}
+                    <a href="{%  url 'login' %}" class="nav-item nav-link">Login</a>
+                {% endif %}
+            </div>
+        </nav>
+        {% if messages %}
+            <div class="message-container">
+                {% for message in messages %}<div class="alert alert-{{ message.tags }} text-center">{{ message }}</div>{% endfor %}
+            </div>
+        {% endif %}
+        {% block body %}{% endblock %}
+    </body>
+</html>

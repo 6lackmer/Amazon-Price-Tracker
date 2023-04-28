@@ -1,0 +1,31 @@
+{% extends 'scraper/base.html' %}
+{% block body %}
+    <div class="container">
+        <div class="text-center">
+            <h1 class="mt-5 mb-4">How to use the Amazon Price Tracker</h1>
+        </div>
+        <hr class="h-4">
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                <ol>
+                    <li>
+                        <strong>Search for items:</strong> Use the search bar at the top of the homepage to search for items you want to track. Click the "Search" button to see the results.
+                    </li>
+                    <br>
+                    <li>
+                        <strong>Select an item and set a target price:</strong> Browse the search results and select the item you want to track. Enter your desired target price, less than the listed price, in the provided input field and click the "Track Item" button.
+                    </li>
+                    <br>
+                    <li>
+                        <strong>View and manage tracked items:</strong> The homepage displays a list of items you are currently tracking. For each item, you can stop tracking or update your target price.
+                    </li>
+                    <br>
+                    <li>
+                        <strong>Receive notifications:</strong> The Amazon Price Tracker periodically checks the prices of your tracked items. You will receive an email notification when the price of a tracked item drops to or below your target price.
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+{% endblock %}

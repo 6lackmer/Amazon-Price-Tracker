@@ -1,121 +1,83 @@
-{% load static %}
-<!doctype html>
-<html lang="en">
-<head>
-    <title>Amazon Price Tracker</title>
-
-    <link rel="stylesheet" href="{% static 'static/style.css' %}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
-    crossorigin="anonymous"></script>
-    <style>
-         .card-img-top {
-             width: 100%;
-             height: 15vw;
-             object-fit: contain;
-             padding: 15px;
-             background-color: #f8f9fa;
-        }
-        .product-column {
-            padding-left: 5px;
-            padding-right: 5px;
-        }
-        .product-row {
-            margin-left: 25px;
-            margin-right: 25px;
-        }
-        .search-form {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        body {
-          background-color: red;
-        }
-    </style>
-
-</head>
-<body>
-<div class="container-fluid">
-    <div class="row mt-3 justify-content-center">
-        <div class="col-md-4">
-            <form action="{% url 'scrape' %}" method="get" class="search-form d-flex">
-                <input type="text" class="form-control flex-grow-1" name="search" placeholder="Search products...">
-                <button type="submit" class="btn btn-primary ml-2">Search</button>
-            </form>
+{% extends 'scraper/base.html' %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row product-row mt-5">
+            {% if message %}
+                <div class="col-12 mx-auto text-center">
+                    <h1>{{ message }}</h1>
+                </div>
+            {% else %}
+                {% for img_url, product_title, product_price, product_link in combined_data %}
+                    <div class="col-lg-2 col-md-6 col-sm-12 mb-4 product-column">
+                        <div class="card h-100">
+                            <img src="{{ img_url }}" alt="{{ product_title }}" class="card-img-top">
+                            <div class="card-body d-flex flex-column">
+                                <a href="{% url 'redirect_view' %}?link={{ product_link }}"
+                                   target="_blank">
+                                    <h5 class="card-title">{{ product_title }}</h5>
+                                </a>
+                                <p class="card-text">${{ product_price }}</p>
+                                <form method="post" action="{% url 'add_tracked_item' %}" class="mt-auto">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_title" value="{{ product_title }}">
+                                    <input type="hidden" name="img_url" value="{{ img_url }}">
+                                    <input type="hidden" name="product_price" value="{{ product_price }}">
+                                    <input type="hidden" name="product_link" value="{{ product_link }}">
+                                    <hr>
+                                    <div class="form-group">
+                                        <!--            <label for="target_price">Enter target price:</label>-->
+                                        <div class="input-group">
+                                            <input type="number"
+                                                   step="0.01"
+                                                   class="form-control"
+                                                   name="target_price"
+                                                   required>
+                                            <div class="input-group-append">
+                                                <button type="submit" class="btn btn-primary btn-block form-control">Track</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
-    </div>
-    <div class="row product-row mt-5">
-        {% if message %}
-        <div class="col-12 text-center">
-            <h4>{{ message }}</h4>
-        </div>
-        {% else %}
-        {% for img_url, product_title, product_price, product_link in combined_data %}
-        <div class="col-lg-2 col-md-6 col-sm-12 mb-4 product-column">
-            <div class="card h-100">
-                <img src="{{ img_url }}" alt="{{ product_title }}" class="card-img-top">
-                <div class="card-body d-flex flex-column">
-    <a href="{% url 'redirect_view' %}?link={{ product_link }}" target="_blank">
-        <h5 class="card-title">{{ product_title }}</h5>
-    </a>
-    <p class="card-text">${{ product_price }}</p>
-    <form method="post" action="{% url 'scrape' %}" class="mt-auto">
-        {% csrf_token %}
-        <input type="hidden" name="product_title" value="{{ product_title }}">
-        <input type="hidden" name="img_url" value="{{ img_url }}">
-        <input type="hidden" name="product_price" value="{{ product_price }}">
-        <input type="hidden" name="product_link" value="{{ product_link }}">
-        <hr>
-        <div class="form-group">
-<!--            <label for="target_price">Enter target price:</label>-->
-            <div class="input-group">
-                <input type="number" step="0.01" class="form-control" name="target_price" required>
-                <div class="input-group-append">
-                    <button type="submit" class="btn btn-primary btn-block form-control">Track</button>
+        <!--  pagination  -->
+        {% if not message %}
+            <div class="row justify-content-center mt-4">
+                <div class="col-auto">
+                    <nav>
+                        <ul class="pagination">
+                            {% if current_page != 1 and current_page != 2 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?search={{ search_query }}&current_page=1">First</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                                <a class="page-link"
+                                   href="?search={{ search_query }}&current_page={{ current_page|add:"-1" }}"
+                                   {% if current_page == 1 %}tabindex="-1" aria-disabled="true"{% endif %}>Previous</a>
+                            </li>
+                            <li class="page-item">
+                                <span class="page-link">{{ current_page }}</span>
+                            </li>
+                            <li class="page-item {% if current_page == num_pages %}disabled{% endif %}">
+                                <a class="page-link"
+                                   href="?search={{ search_query }}&current_page={{ current_page|add:"1" }}"
+                                   {% if current_page == num_pages %}tabindex="-1" aria-disabled="true"{% endif %}>Next</a>
+                            </li>
+                            {% if current_page != num_pages and current_page != num_pages|add:"-1" %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?search={{ search_query }}&current_page={{ num_pages }}">Last</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
                 </div>
             </div>
-        </div>
-    </form>
-</div>
-
-            </div>
-        </div>
-        {% endfor %}
         {% endif %}
     </div>
-
-    <!--  pagination  -->
-    {% if not message %}
-    <div class="row justify-content-center mt-4">
-        <div class="col-auto">
-            <nav>
-                <ul class="pagination">
-                    {% if current_page != 1 and current_page != 2%}
-                    <li class="page-item">
-                        <a class="page-link" href="?search={{ search_query }}&current_page=1">First</a>
-                    </li>
-                    {% endif %}
-                    <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
-                        <a class="page-link" href="?search={{ search_query }}&current_page={{ current_page|add:"-1" }}" {% if current_page == 1 %}tabindex="-1" aria-disabled="true"{% endif %}>Previous</a>
-                    </li>
-                    <li class="page-item">
-                        <span class="page-link">{{ current_page }}</span>
-                    </li>
-                    <li class="page-item {% if current_page == num_pages %}disabled{% endif %}">
-                        <a class="page-link" href="?search={{ search_query }}&current_page={{ current_page|add:"1" }}" {% if current_page == num_pages %}tabindex="-1" aria-disabled="true"{% endif %}>Next</a>
-                    </li>
-                    {% if current_page != num_pages and current_page != num_pages|add:"-1" %}
-                    <li class="page-item">
-                        <a class="page-link" href="?search={{ search_query }}&current_page={{ num_pages }}">Last</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
-    </div>
-    {% endif %}
-
-</div>
-</body>
-</html>
+{% endblock %}
