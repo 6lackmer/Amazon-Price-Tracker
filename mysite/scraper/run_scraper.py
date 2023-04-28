@@ -1,5 +1,3 @@
-# run_scraper.py
-
 import time
 from threading import Thread
 from scraper.price_scraper import scrape_prices

@@ -38,4 +38,5 @@ def scrape_prices():
                 send_mail(subject, message, from_email, recipient_list)
                 print(f'Sent price alert for {item.product_title} to {item.user.email}')
         except Exception as err:
+            # certain products have different layouts. Movies for example.
             print(f'Error processing {item.product_title}: {err}')
